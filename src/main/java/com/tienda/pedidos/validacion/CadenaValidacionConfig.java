@@ -6,14 +6,18 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CadenaValidacionConfig {
 
-    @Bean("cadenaValidacion")
+    @Bean (name = "cadenaPrincipal")
     public ValidadorPedido cadenaValidacion(
             ValidadorStock stock,
-            ValidadorCliente cliente
+            ValidadorCliente cliente,
+            PromocionBlackFriday blackFriday,
+            PromocionCorporativo corporativo,
+            PromocionVolumen volumen
     ) {
-
         stock.encadenar(cliente);
-
+        cliente.encadenar(blackFriday);
+        blackFriday.encadenar(corporativo);
+        corporativo.encadenar(volumen);
         return stock;
     }
 }

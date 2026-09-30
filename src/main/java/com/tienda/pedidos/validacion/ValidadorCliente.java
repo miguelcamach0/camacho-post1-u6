@@ -11,7 +11,7 @@ public class ValidadorCliente extends ValidadorPedido {
 
     @Override
     protected void ejecutar(ContextoPedido contexto) {
-        Long clienteId = contexto.getRequest().getClienteId();
+        String clienteId = contexto.getRequest().getClienteId();
         String tipo = jdbcTemplate.queryForObject(
             "SELECT tipo_cliente FROM clientes WHERE id = ?", String.class, clienteId);
         if (tipo == null) { contexto.rechazar("Cliente no registrado"); return; }

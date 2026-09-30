@@ -26,7 +26,7 @@ class GestorPedidosTest {
 
         PedidoRequest request = new PedidoRequest();
 
-        request.setClienteId(1L);
+        request.setClienteId("C001");
         request.setClienteEmail("vip@test.com");
 
         ItemPedido item = new ItemPedido();
@@ -51,7 +51,7 @@ class GestorPedidosTest {
 
         PedidoRequest request = new PedidoRequest();
 
-        request.setClienteId(999L);
+        request.setClienteId("C999");
         request.setClienteEmail("cliente@test.com");
 
         ItemPedido item = new ItemPedido();
@@ -71,7 +71,7 @@ class GestorPedidosTest {
 
         PedidoRequest request = new PedidoRequest();
 
-        request.setClienteId(3L);
+        request.setClienteId("C003");
         request.setClienteEmail("moroso@test.com");
 
         ItemPedido item = new ItemPedido();
@@ -95,7 +95,7 @@ class GestorPedidosTest {
 
         PedidoRequest request = new PedidoRequest();
 
-        request.setClienteId(1L);
+        request.setClienteId("C001");
         request.setClienteEmail("vip@test.com");
 
         ItemPedido item = new ItemPedido();
@@ -118,7 +118,7 @@ class GestorPedidosTest {
 
         PedidoRequest request = new PedidoRequest();
 
-        request.setClienteId(2L);
+        request.setClienteId("C002");
         request.setClienteEmail("frecuente@test.com");
 
         ItemPedido item = new ItemPedido();

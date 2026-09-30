@@ -1,7 +1,13 @@
-INSERT INTO clientes VALUES(1,'VIP');
-INSERT INTO clientes VALUES(2,'FRECUENTE');
-INSERT INTO clientes VALUES(3,'MOROSO');
+DELETE FROM clientes;
 
+INSERT INTO clientes VALUES
+('C001','Cliente VIP','VIP','900111111');
+
+INSERT INTO clientes VALUES
+('C002','Cliente Frecuente','FRECUENTE','900222222');
+
+INSERT INTO clientes VALUES
+('C003','Cliente Moroso','MOROSO','900333333');
 
 INSERT INTO productos VALUES(10,100000);
 INSERT INTO productos VALUES(20,600000);
@@ -11,7 +17,7 @@ INSERT INTO inventario VALUES(10,20);
 INSERT INTO inventario VALUES(20,5);
 
 
-INSERT INTO facturas VALUES(3,500000,false);
+INSERT INTO facturas VALUES('C003',500000,false);
 
 
 INSERT INTO pedidos

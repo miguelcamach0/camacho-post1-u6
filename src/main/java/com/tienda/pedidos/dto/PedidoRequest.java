@@ -3,15 +3,15 @@ package com.tienda.pedidos.dto;
 import java.util.List;
 
 public class PedidoRequest {
-    private Long clienteId;
+    private String clienteId;
     private String clienteEmail;
     private List<ItemPedido> items;
 
-    public Long getClienteId() {
+    public String getClienteId() {
         return clienteId;
     }
 
-    public void setClienteId(Long clienteId) {
+    public void setClienteId(String clienteId) {
         this.clienteId = clienteId;
     }
 

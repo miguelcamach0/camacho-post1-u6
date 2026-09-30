@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.tienda.pedidos.GestorPedidosTest
--------------------------------------------------------------------------------
-Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.416 s -- in com.tienda.pedidos.GestorPedidosTest
