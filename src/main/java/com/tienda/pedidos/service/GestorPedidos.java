@@ -8,6 +8,9 @@ import com.tienda.pedidos.dto.PedidoRequest;
 import com.tienda.pedidos.dto.ResultadoPedido;
 import com.tienda.pedidos.repository.PedidoRepository;
 import com.tienda.pedidos.validacion.ContextoPedido;
+import com.tienda.pedidos.validacion.PromocionBlackFriday;
+import com.tienda.pedidos.validacion.PromocionCorporativo;
+import com.tienda.pedidos.validacion.PromocionVolumen;
 import com.tienda.pedidos.validacion.ValidadorPedido;
 
 @org.springframework.stereotype.Service
@@ -17,7 +20,7 @@ public class GestorPedidos {
     private final PedidoRepository repository;
     private final NotificacionPedidoService notificacion;
 
-    public GestorPedidos( @Qualifier("cadenaValidacion") ValidadorPedido primerValidador,
+    public GestorPedidos( @Qualifier("cadenaPrincipal") ValidadorPedido primerValidador, PromocionBlackFriday blackFriday, PromocionCorporativo corporativo, PromocionVolumen volumen, 
             SelectorEstrategiaDescuento selector, PedidoRepository repository,
             NotificacionPedidoService notificacion) {
         this.primerValidador = primerValidador;
@@ -35,6 +38,7 @@ public class GestorPedidos {
         double subtotal = calcularSubtotal(request); // consulta de precios extraida sin cambios de logica
         contexto.setSubtotal(subtotal);
 
+        System.out.println("TIPO CLIENTE: " + contexto.getTipoCliente());
         double descuento = selector.seleccionar(contexto.getTipoCliente()).calcular(contexto);
         double impuesto = (subtotal - subtotal * descuento) * 0.19;
         double total = subtotal - (subtotal * descuento) + impuesto;
