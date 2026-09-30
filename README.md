@@ -40,3 +40,46 @@ Alternativa descartada:
 - Para los descuentos consideré Chain of Responsabiliti, pero no era adecuado porque una cadena representa una serie de pasos donde varios componentes deciden si procesar o rechazar una solicitud, para el caso de los descuentos no maneja ese flujo (Violaría OCP).
 -Mantener el JdbcTemplate dentro de GestorPedidos, pero hubiese conservado aún el problema original.
 - Mantener la notificación dentro del servicio principal era más sencillo inicialmente, pero aumenta el acoplamiento y contradice SRP.
+
+### Parte 2 — Crecimiento del proyecto
+**Antipatrón identificado:** Golden Hammer.
+Las nuevas campañas de descuento ("PromocionBlackFriday", 
+"PromocionCorporativo" y "PromocionVolumen") fueron implementadas como
+nuevos eslabones dentro de la cadena "ValidadorPedido", reutilizando el
+patrón Chain of Responsibility aplicado previamente para las validaciones
+de stock y cliente.
+
+Sin embargo, el nuevo problema no tenía la misma naturaleza que el
+problema original. Los validadores iniciales requerían una secuencia
+ordenada y posibilidad de corte anticipado: si "ValidadorStock" rechazaba
+el pedido, "ValidadorCliente" no debía ejecutarse. En cambio, las clases
+de promoción no presentan dependencia de orden entre ellas ni tienen la
+responsabilidad de aceptar o rechazar un pedido.
+
+La evidencia se encuentra en que las nuevas clases extienden
+"ValidadorPedido", pero sus implementaciones no realizan validaciones ni
+rechazos:
+
+- "PromocionBlackFriday.ejecutar()" únicamente evalúa si la campaña está
+  activa y modifica el descuento mediante "contexto.aplicarDescuentoCampana(0.25)".
+- "PromocionCorporativo.ejecutar()" consulta el NIT del cliente y aplica un porcentaje de descuento cuando corresponde.
+- "PromocionVolumen.ejecutar()" calcula la cantidad total de unidades y aplica un descuento si supera el límite establecido.
+
+Ninguno de estos eslabones utiliza la capacidad principal de
+"ValidadorPedido", que consiste en decidir si el flujo continúa o si el
+pedido debe rechazarse.
+
+Además, las tres promociones comparten un estado mutable dentro de
+"ContextoPedido" mediante el atributo "descuentoCampana". Cada promoción
+escribe sobre ese campo utilizando una regla de "el mayor descuento
+gana", lo que acopla la resolución del descuento a la ejecución de la
+cadena. Si en el futuro las reglas comerciales cambiaran y dos campañas
+debieran combinarse, acumularse o aplicarse bajo una prioridad diferente,
+la estructura actual no permitiría expresar claramente esa decisión.
+
+La implementación se realizó porque Chain of Responsibility había
+resuelto correctamente el problema anterior, pero no porque fuera la
+abstracción más adecuada para las campañas promocionales. Se aplicó una
+solución conocida a un problema con características diferentes, lo que
+corresponde al antipatrón Golden Hammer.
+
