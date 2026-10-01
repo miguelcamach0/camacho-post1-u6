@@ -83,3 +83,45 @@ abstracción más adecuada para las campañas promocionales. Se aplicó una
 solución conocida a un problema con características diferentes, lo que
 corresponde al antipatrón Golden Hammer.
 
+**Decisión con justificación — Strategy en vez de nuevos eslabones de Chain of Responsibility**
+Se corrigió la implementación modelando las campañas promocionales (Black Friday, Corporativo y Volumen) como nuevas estrategias de descuento (EstrategiaDescuento) en lugar de agregarlas como eslabones adicionales de la cadena de validación.
+
+La decisión se tomó porque estas campañas tienen la misma naturaleza que las estrategias existentes (DescuentoVip y DescuentoFrecuente): calculan un porcentaje de descuento a partir de información del pedido o del cliente, pero no tienen la responsabilidad de validar condiciones que permitan rechazar el flujo ni dependen de un orden específico de ejecución. En cambio, los validadores ValidadorStock y ValidadorCliente sí justifican el uso de Chain of Responsibility, debido a que cada eslabón puede detener el procesamiento del pedido mediante un rechazo.
+
+Mantener las campañas dentro de la cadena habría significado reutilizar un patrón conocido para un problema diferente, sin evaluar si sus características coincidían con el propósito original del patrón. Por esta razón, la alternativa fue descartada al ser la causa del antipatrón Golden Hammer identificado.
+
+**Decisión con justificación — Eliminar código descartado en lugar de comentarlo**
+Después de la corrección se eliminaron completamente las clases:
+- PromocionBlackFriday
+- PromocionCorporativo
+- PromocionVolumen
+- el atributo descuentoCampana del ContextoPedido.
+
+No se conservaron como código comentado porque dejar implementaciones obsoletas dentro del proyecto puede generar confusión sobre su vigencia y dificultar futuras modificaciones. La trazabilidad del diseño anterior queda preservada mediante el historial de commits del repositorio, mientras que el código fuente mantiene únicamente la solución actualmente utilizada.
+
+
+**Patrón aplicado:** 
+
+Se implementó el patrón Strategy para encapsular las diferentes reglas de cálculo de descuentos dentro de estrategias independientes (DescuentoCorporativo, DescuentoBlackFriday, DescuentoVolumen, entre otras), evitando que la clase GestorPedidos tuviera que conocer o modificar directamente cada regla de negocio.
+
+Inicialmente, el cálculo de descuentos presentaba una estructura rígida donde la incorporación de nuevas condiciones implicaba modificar clases existentes, aumentando el acoplamiento y dificultando la extensión del sistema.
+La solución consistió en crear una abstracción común mediante EstrategiaDescuento, permitiendo que cada estrategia implemente su propio algoritmo de descuento. Posteriormente, CalculadorDescuentoFinal se encargó de coordinar estas estrategias y seleccionar el descuento aplicable mediante SelectorEstrategiaDescuento.
+
+Además, se eliminaron los eslabones de una implementación previa de cadena de responsabilidad que no representaban una necesidad real del dominio, junto con el campo descuentoCampana, evitando conservar código muerto o estructuras sin uso que podrían convertirse en un antipatrón Lava Flow. El historial de estos cambios queda registrado únicamente en los commits del repositorio.
+
+*Alternativa considerada: Chain of Responsibility*
+Como alternativa se evaluó el patrón Chain of Responsibility, debido a que inicialmente el problema podía interpretarse como una cadena de validaciones donde cada regla de descuento tendría la oportunidad de aplicar una modificación al pedido.
+Sin embargo, se descartó porque las reglas de descuento no requerían necesariamente una secuencia fija de procesamiento. El objetivo real era comparar diferentes estrategias disponibles y seleccionar la regla aplicable, no pasar la solicitud por una cadena donde cada elemento decidiera si continuar o detener el flujo.
+
+## Cómo ejecutar
+```
+$ mvn spring-boot:run
+$ mvn test
+```
+
+## Herramientas utilizadas
+- Java 17, Spring Boot, Spring JDBC, Maven, H2 Database
+- VS Code / IntelliJ IDEA, Git, GitHub
+
+## Conclusiones
+La actividad fue un proceso exigente y en varios momentos frustrante, especialmente al enfrentar errores de implementación y comprender cómo aplicar correctamente los patrones de diseño al código existente. Sin embargo, permitió comprender que refactorizar no consiste únicamente en modificar código, sino en analizar las responsabilidades, identificar problemas de diseño y justificar técnicamente cada decisión. También fue importante comprobar mediante pruebas que los cambios realizados mantuvieran el comportamiento esperado, lo que permitió desarrollar mayor confianza en el proceso de depuración y validación. En conjunto, ambas partes fortalecieron la comprensión de patrones como Chain of Responsibility y Strategy, así como la importancia de aplicar cada patrón cuando realmente aporta una solución al problema y no simplemente por utilizarlo.
