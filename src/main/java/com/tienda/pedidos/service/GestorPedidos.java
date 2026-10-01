@@ -2,29 +2,26 @@ package com.tienda.pedidos.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import com.tienda.pedidos.descuento.SelectorEstrategiaDescuento;
+import com.tienda.pedidos.descuento.CalculadorDescuentoFinal;
 import com.tienda.pedidos.dto.ItemPedido;
 import com.tienda.pedidos.dto.PedidoRequest;
 import com.tienda.pedidos.dto.ResultadoPedido;
 import com.tienda.pedidos.repository.PedidoRepository;
 import com.tienda.pedidos.validacion.ContextoPedido;
-import com.tienda.pedidos.validacion.PromocionBlackFriday;
-import com.tienda.pedidos.validacion.PromocionCorporativo;
-import com.tienda.pedidos.validacion.PromocionVolumen;
 import com.tienda.pedidos.validacion.ValidadorPedido;
 
 @org.springframework.stereotype.Service
 public class GestorPedidos {
     private final ValidadorPedido primerValidador;
-    private final SelectorEstrategiaDescuento selector;
+    private final CalculadorDescuentoFinal calculadorDescuento;
     private final PedidoRepository repository;
     private final NotificacionPedidoService notificacion;
 
-    public GestorPedidos( @Qualifier("cadenaPrincipal") ValidadorPedido primerValidador, PromocionBlackFriday blackFriday, PromocionCorporativo corporativo, PromocionVolumen volumen, 
-            SelectorEstrategiaDescuento selector, PedidoRepository repository,
+    public GestorPedidos(@Qualifier("cadenaPrincipal") ValidadorPedido primerValidador,
+            CalculadorDescuentoFinal calculadorDescuento, PedidoRepository repository,
             NotificacionPedidoService notificacion) {
         this.primerValidador = primerValidador;
-        this.selector = selector;
+        this.calculadorDescuento = calculadorDescuento;
         this.repository = repository;
         this.notificacion = notificacion;
     }
@@ -39,31 +36,29 @@ public class GestorPedidos {
         contexto.setSubtotal(subtotal);
 
         System.out.println("TIPO CLIENTE: " + contexto.getTipoCliente());
-        double descuento = selector.seleccionar(contexto.getTipoCliente()).calcular(contexto);
+        double descuento = calculadorDescuento.calcular(contexto);
         double impuesto = (subtotal - subtotal * descuento) * 0.19;
         double total = subtotal - (subtotal * descuento) + impuesto;
 
         Long pedidoId = repository.guardar(contexto, descuento, impuesto, total);
         notificacion.notificarConfirmacion(contexto, pedidoId, descuento, impuesto, total);
-        return ResultadoPedido.confirmado(pedidoId, total);
+        return ResultadoPedido.confirmado(pedidoId, total, descuento);
     }
 
     private double calcularSubtotal(PedidoRequest request) {
 
-    double subtotal = 0;
+        double subtotal = 0;
 
-    for (ItemPedido item : request.getItems()) {
+        for (ItemPedido item : request.getItems()) {
 
-        Double precioUnitario =
-                repository.obtenerPrecioProducto(
-                        item.getProductoId()
-                );
+            Double precioUnitario = repository.obtenerPrecioProducto(
+                    item.getProductoId());
 
-        subtotal += precioUnitario * item.getCantidad();
+            subtotal += precioUnitario * item.getCantidad();
+        }
+
+        return subtotal;
     }
-
-    return subtotal;
-}
     // calcularSubtotal(...) se mantiene como metodo privado de calculo puro, sin
     // SQL embebido
     // en la logica de negocio (se extrae a un pequeno metodo con una unica consulta
