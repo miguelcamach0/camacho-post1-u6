@@ -9,15 +9,9 @@ public class CadenaValidacionConfig {
     @Bean (name = "cadenaPrincipal")
     public ValidadorPedido cadenaValidacion(
             ValidadorStock stock,
-            ValidadorCliente cliente,
-            PromocionBlackFriday blackFriday,
-            PromocionCorporativo corporativo,
-            PromocionVolumen volumen
+            ValidadorCliente cliente
     ) {
         stock.encadenar(cliente);
-        cliente.encadenar(blackFriday);
-        blackFriday.encadenar(corporativo);
-        corporativo.encadenar(volumen);
         return stock;
     }
 }

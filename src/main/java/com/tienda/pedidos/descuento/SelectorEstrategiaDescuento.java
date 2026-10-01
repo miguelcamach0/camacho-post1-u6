@@ -7,10 +7,10 @@ public class SelectorEstrategiaDescuento {
 
     public SelectorEstrategiaDescuento(DescuentoVip vip, DescuentoFrecuente frecuente,
                                         DescuentoEstandar estandar) {
-        this.estrategias = java.util.Map.of("VIP", vip, "FRECUENTE", frecuente, "ESTANDAR", estandar);
+        this.estrategias = java.util.Map.of("VIP", vip, "FRECUENTE", frecuente, "ESTANDAR", estandar, "NORMAL", estandar);
     }
 
     public EstrategiaDescuento seleccionar(String tipoCliente) {
-        return estrategias.getOrDefault(tipoCliente, estrategias.get("ESTANDAR"));
+        return estrategias.getOrDefault(tipoCliente, estrategias.get("NORMAL"));
     }
 }

@@ -9,6 +9,12 @@ INSERT INTO clientes VALUES
 INSERT INTO clientes VALUES
 ('C003','Cliente Moroso','MOROSO','900333333');
 
+INSERT INTO clientes VALUES
+('C004','Cliente Normal','NORMAL',NULL);
+
+INSERT INTO clientes VALUES
+('C005','Empresa ABC','NORMAL','900555555');
+
 INSERT INTO productos VALUES(10,100000);
 INSERT INTO productos VALUES(20,600000);
 

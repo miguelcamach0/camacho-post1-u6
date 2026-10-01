@@ -5,10 +5,11 @@ public class ResultadoPedido {
     private Long pedidoId;
     private double total;
     private String motivoRechazo;
+    private double descuento;
 
-    public static ResultadoPedido confirmado(Long pedidoId, double total) {
+    public static ResultadoPedido confirmado(Long pedidoId, double total, double descuento) {
         ResultadoPedido r = new ResultadoPedido();
-        r.confirmado = true; r.pedidoId = pedidoId; r.total = total;
+        r.confirmado = true; r.pedidoId = pedidoId; r.total = total; r.descuento = descuento;
         return r;
     }
     public static ResultadoPedido rechazado(String motivo) {
@@ -31,6 +32,10 @@ public class ResultadoPedido {
 
     public String getMotivoRechazo() {
         return motivoRechazo;
+    }
+
+    public double getDescuento() {
+        return descuento;
     }
 
     

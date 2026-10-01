@@ -2,11 +2,14 @@ package com.tienda.pedidos;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -16,6 +19,8 @@ import com.tienda.pedidos.dto.ResultadoPedido;
 import com.tienda.pedidos.service.GestorPedidos;
 
 @SpringBootTest
+@TestMethodOrder(MethodOrderer.Random.class)
+@org.springframework.test.annotation.DirtiesContext(classMode = org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class GestorPedidosTest {
 
     @Autowired
@@ -132,6 +137,94 @@ class GestorPedidosTest {
 
         assertTrue(resultado.isConfirmado());
 
+    }
+
+    @Test
+    void aplicaBlackFriday() {
+
+        PedidoRequest request = new PedidoRequest();
+
+        request.setClienteId("C001");
+
+        ItemPedido item = new ItemPedido();
+        item.setProductoId(10L);
+        item.setCantidad(1);
+
+        request.setItems(List.of(item));
+
+        ResultadoPedido resultado = gestorPedidos.procesarPedido(request);
+
+        assertTrue(resultado.isConfirmado());
+
+        assertEquals(0.25, resultado.getDescuento());
+    }
+
+    @Test
+    void aplicaDescuentoVolumen() {
+
+        PedidoRequest request = new PedidoRequest();
+
+        request.setClienteId("C004");
+
+        ItemPedido item1 = new ItemPedido();
+        item1.setProductoId(10L);
+        item1.setCantidad(16);
+
+        ItemPedido item2 = new ItemPedido();
+        item2.setProductoId(20L);
+        item2.setCantidad(5);
+
+        request.setItems(List.of(item1, item2));
+
+        ResultadoPedido resultado = gestorPedidos.procesarPedido(request);
+
+        assertEquals(0.25, resultado.getDescuento());
+    }
+
+    @Test
+    void aplicaDescuentoCorporativo() {
+
+        PedidoRequest request = new PedidoRequest();
+
+        request.setClienteId("C005");
+
+        ItemPedido item = new ItemPedido();
+
+        item.setProductoId(10L);
+        item.setCantidad(1);
+
+        request.setItems(List.of(item));
+
+        ResultadoPedido resultado = gestorPedidos.procesarPedido(request);
+
+        assertTrue(resultado.isConfirmado());
+
+        assertEquals(0.25, resultado.getDescuento());
+    }
+
+    @Test
+    void calculaMismoDescuentoQueReglasAnteriores() {
+
+        PedidoRequest request = new PedidoRequest();
+
+        request.setClienteId("C004");
+
+        ItemPedido item1 = new ItemPedido();
+        item1.setProductoId(10L);
+        item1.setCantidad(16);
+
+        ItemPedido item2 = new ItemPedido();
+        item2.setProductoId(20L);
+        item2.setCantidad(5);
+
+        request.setItems(List.of(item1, item2));
+
+        ResultadoPedido resultado = gestorPedidos.procesarPedido(request);
+
+        // Antes Paso 5 daba 25% por Black Friday
+        // Ahora CalculadorDescuentoFinal debe mantenerlo
+
+        assertEquals(0.25, resultado.getDescuento());
     }
 
 }
